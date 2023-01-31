@@ -26,17 +26,17 @@ architecture Behavioral of fir_top is
     signal mac_inter : mac_array_inter :=(others => (others=>(others=>'0')));
     type coef_t is array (fir_ord downto 0) of std_logic_vector(input_data_width-1 downto 0);
     signal b_s : coef_t := (others=>(others=>'0')); 
-    signal delay_reg : std_logic_vector(2*input_data_width-1 downto 0);  
-    
-    --voter signals
-    signal voter_input_s : std_logic_vector (n*2*input_data_width-1 downto 0);             
-    signal voter_output_s : std_logic_vector (2*input_data_width-1 downto 0);      
+    signal delay_reg : std_logic_vector(2*input_data_width-1 downto 0);       
     
     --rendundancy spares signals
     type redundancy_o_array is array (fir_ord downto 0) of std_logic_vector (2*input_data_width-1 downto 0);  
     signal redundancy_output : redundancy_o_array;  
     type redundancy_i_array is array (fir_ord downto 0) of std_logic_vector ((n + k)*2*input_data_width-1 downto 0);
     signal redundancy_input : redundancy_i_array;       
+    
+    --delay for data input
+    type delay_data is array (1 to fir_ord) of std_logic_vector (input_data_width-1 downto 0);
+    signal data_del_reg, data_del_next : delay_data;
     
     -------------------------------------------------------------
     attribute dont_touch : string;                  
@@ -60,6 +60,7 @@ begin
         entity work.mac(behavioral)
         generic map(input_data_width=>input_data_width)
         port map(clk_i=>clk_i,
+                 rst_i=> rst_i,
                  u_i=>data_i,
                  b_i=>b_s(fir_ord),
                  sec_i=>delay_reg,
@@ -89,11 +90,31 @@ begin
                     k => k)
         port map(clk_i=>clk_i,
                  rst_i=>rst_i,
-                 we_i=>we_i,
                  input_i=>redundancy_input(i),
                  output_o=>redundancy_output(i));
     end generate;
         
+    data_delay_registers:
+    process(clk_i)
+    begin
+        if(clk_i'event and clk_i = '1')then
+            if rst_i = '1' then
+                for i in 1 to fir_ord loop
+                    data_del_reg(i) <= (others => '0');
+                end loop;
+            else
+                for i in 1 to fir_ord loop
+                    data_del_reg(i) <= data_del_next(i);
+                end loop;
+           end if;
+        end if;
+    end process;
+    data_del_next(1) <= data_i;
+    delay_mac:
+    for i in 2 to fir_ord generate
+        data_del_next(i) <= data_del_reg(i-1);
+    end generate;
+    
     other_sections:
     for i in 1 to fir_ord generate
         fir_section:
@@ -102,7 +123,9 @@ begin
             entity work.mac(behavioral)
             generic map(input_data_width=>input_data_width)
             port map(clk_i=>clk_i,
-                     u_i=>data_i,
+                     rst_i=> rst_i,
+                    -- u_i=>data_i,
+                     u_i=>data_del_reg(i),
                      b_i=>b_s(fir_ord-i),
                      sec_i=>redundancy_output(i-1),
                      sec_o=>mac_inter(r)(i));

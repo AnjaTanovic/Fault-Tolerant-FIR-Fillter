@@ -11,7 +11,6 @@ entity redundancy_spares is
             k : natural := 3);
     Port ( clk_i : in STD_LOGIC;
            rst_i : in STD_LOGIC;
-           we_i : in STD_LOGIC;
            input_i : in STD_LOGIC_VECTOR ((n + k)*2*input_data_width-1 downto 0);
            output_o : out STD_LOGIC_VECTOR (2*input_data_width-1 downto 0));
 end redundancy_spares;
@@ -53,12 +52,10 @@ begin
                     offset_reg(i) <= (others => '0');
                 end loop;
             else
-                if we_i = '1' then
-                    for i in 0 to n -1 loop
-                        voter_reg(i) <= voter_next(i);
-                        offset_reg(i) <= offset_next(i);
-                    end loop;
-                end if;
+                for i in 0 to n -1 loop
+                    voter_reg(i) <= voter_next(i);
+                    offset_reg(i) <= offset_next(i);
+                end loop;
            end if;
         end if;
     end process;
@@ -100,9 +97,7 @@ begin
             if rst_i = '1' then
                 num_of_failure_reg <= (others => '0');
             else
-                if we_i = '1' then
-                    num_of_failure_reg <= num_of_failure_next;
-                end if;
+                num_of_failure_reg <= num_of_failure_next;
             end if;
         end if;
     end process;
@@ -115,10 +110,10 @@ begin
         for i in 0 to n -1 loop
             if (comp(i) = '0') then
                 offset_next(i) <= num_of_failure_next;
-                voter_next(i) <= inputs_s(to_integer(unsigned(num_of_failure_next)));
+                voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)));
             else 
                 offset_next(i) <= offset_reg(i);
-                voter_next(i) <= inputs_s(to_integer(unsigned(offset_reg(i))));
+                voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(offset_reg(i))));
             end if;
         end loop;
     end process;

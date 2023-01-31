@@ -57,8 +57,11 @@ begin
     process
         variable tv : line;
     begin
-        --upis koeficijenata
         data_i_s <= (others=>'0');
+        rst_i_s <= '1';
+        wait until falling_edge(clk_i_s);
+        rst_i_s <= '0';
+        --upis koeficijenata
         wait until falling_edge(clk_i_s);
         for i in 0 to fir_ord loop
             we_i_s <= '1';
@@ -84,7 +87,9 @@ begin
         variable tmp : std_logic_vector(in_out_data_width-1 downto 0);
     begin
         wait until start_check = '1';
-        wait until rising_edge(clk_i_s); --wait because of input registers
+        for i in 0 to fir_ord + 1 loop
+            wait until rising_edge(clk_i_s); --wait because of input registers
+        end loop;
         while(true)loop
             wait until rising_edge(clk_i_s);
             readline(output_check_vector,check_v);

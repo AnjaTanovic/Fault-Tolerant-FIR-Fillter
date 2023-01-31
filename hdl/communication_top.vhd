@@ -40,7 +40,7 @@ architecture Behavioral of communication_top is
 	signal state_reg_m, state_next_m : state_type;
 begin
 
-    fir_component:
+    fir_filter:
     entity work.fir_top(Behavioral)
     generic map(fir_ord => fir_ord,
                 input_data_width => input_data_width,
