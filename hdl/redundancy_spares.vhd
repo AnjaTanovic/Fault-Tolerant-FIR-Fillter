@@ -110,10 +110,18 @@ begin
         for i in 0 to n -1 loop
             if (comp(i) = '0') then
                 offset_next(i) <= num_of_failure_next;
-                voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)));
+                if (to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)) < n + k) then
+                    voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)));
+                else
+                    voter_next(i)<= inputs_s(i); --system is not correct 
+                end if;
             else 
                 offset_next(i) <= offset_reg(i);
-                voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(offset_reg(i))));
+                if (to_integer(to_unsigned(i,log2c(n+k)) + unsigned(offset_reg(i))) < n + k) then
+                    voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(offset_reg(i))));
+                else
+                    voter_next(i)<= inputs_s(i); --system is not correct 
+                end if;
             end if;
         end loop;
     end process;

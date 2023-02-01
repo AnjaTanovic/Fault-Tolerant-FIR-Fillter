@@ -9,7 +9,9 @@ use work.util_pkg.all;
 entity tb_fir is
     generic(in_out_data_width : natural := 17;
             fixed_point : natural := 1;
-            fir_ord : natural := 10);
+            fir_ord : natural := 10;
+            n : natural := 3;
+            k : natural := 2);
 --  Port ( );
 end tb_fir;
 
@@ -35,7 +37,9 @@ begin
     generic map(fir_ord=>fir_ord,
                 fixed_point=>fixed_point,
                 input_data_width=>in_out_data_width,
-                output_data_width=>in_out_data_width)
+                output_data_width=>in_out_data_width,
+                n => n,
+                k => k)
     port map(clk_i=>clk_i_s,
              rst_i=>rst_i_s,
              we_i=>we_i_s,
