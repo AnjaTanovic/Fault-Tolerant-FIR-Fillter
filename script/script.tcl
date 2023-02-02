@@ -25,6 +25,10 @@ add_files -norecurse ..\/hdl\/txt_util.vhd
 add_files -norecurse ..\/hdl\/util_pkg.vhd
 update_compile_order -fileset sources_1
 
-# Ukljucivanje testbenc fajla u projekat
+# Ukljucivanje ogranicenja u projekat
+add_files -fileset constrs_1 ..\/constraints\/clk_constraint.xdc
+
+# Ukljucivanje testbenc fajlova u projekat
+add_files -fileset sim_1 -norecurse ..\/hdl\/tb_communication.vhd
 add_files -fileset sim_1 -norecurse ..\/hdl\/tb_fir.vhd
 update_compile_order -fileset sim_1

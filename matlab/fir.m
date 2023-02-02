@@ -6,7 +6,7 @@ word_length = 17;
 fraction_length = 16;
 
 %specifikacija NF filtra
-fir_ord = 10;
+fir_ord = 5;
 Wn=[0.1];
 %odbirci prozorske funkcije koja se koristi
 pravougaoni = rectwin(fir_ord+1);

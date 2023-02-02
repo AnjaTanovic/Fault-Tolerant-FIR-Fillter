@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 use work.util_pkg.all;
 
 entity fir_top is
-    generic(fir_ord : natural := 10;
+    generic(fir_ord : natural := 5;
             fixed_point : natural := 1;
             input_data_width : natural := 17;
             output_data_width : natural := 17;
