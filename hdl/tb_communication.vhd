@@ -100,7 +100,7 @@ begin
         s_axi_tdata_s <= to_std_logic_vector(string(tv));  --prvi odbirak postavljen na liniju za podatke
         s_axi_tvalid_s <= '1';
         wait until falling_edge(clk_i_s);
-        while (s_axi_tready_s /= '1') loop   --cekanje na handshake
+        while (s_axi_tready_s /= '1') loop   --cekanje potvrde spremnosti
             wait until falling_edge(clk_i_s);
         end loop;
         
@@ -120,7 +120,7 @@ begin
                     s_axi_tvalid_s <= '0';
                     s_axi_tdata_s <= (others=>'0');
                 end if;
-                end_s <= end_s + 1; --videti da li ovo pravi petlju ????
+                end_s <= end_s + 1;
             end if;
         end loop;
         start_check <= '0';
@@ -134,18 +134,18 @@ begin
     begin
         m_axi_tready_s <= '1';
         wait until start_check = '1';
-        for i in 0 to fir_ord loop --proveriti !!!!!!!!!!!!! da li treba +1 (izbaceno jer je readline jedan izbacen ranije)
-            wait until rising_edge(clk_i_s); --wait because of input registers
+        for i in 0 to fir_ord loop 
+            wait until rising_edge(clk_i_s); --cekanje zbog kasnjenja na ulazu
         end loop;
         while(true)loop
             wait until rising_edge(clk_i_s);
             readline(output_check_vector,check_v);
             tmp := to_std_logic_vector(string(check_v));
             if(abs(signed(tmp) - signed(m_axi_tdata_s)) > "000000000000000000000111")then
-                report "result mismatch!" severity failure;
+                report "Result mismatch!" severity failure;
             end if;
             if m_axi_tlast_s = '1' then
-                report "verification done!" severity failure; 
+                report "Verification done!" severity failure; 
             end if;
         end loop;
     end process;

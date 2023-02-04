@@ -71,9 +71,7 @@ begin
     process(mac_inter, redundancy_input)
     begin
         for f in 0 to fir_ord loop
-           -- redundancy_input(f)(2*input_data_width-1 downto 0) <= mac_inter(0)(f);
             for i in 0 to (n + k) - 1 loop
-             --   redundancy_input(f)((i+1)*2*input_data_width-1 downto 0) <= mac_inter(i)(f) & redundancy_input(f)(i*2*input_data_width-1 downto 0);
               redundancy_input(f)(2*input_data_width + 2*input_data_width *i-1 downto 2*input_data_width*i) <= mac_inter(i)(f);
             end loop; 
         end loop; 

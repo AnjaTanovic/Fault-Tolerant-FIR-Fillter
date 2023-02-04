@@ -9,7 +9,7 @@ use work.util_pkg.all;
 entity tb_fir is
     generic(in_out_data_width : natural := 17;
             fixed_point : natural := 1;
-            fir_ord : natural := 10;
+            fir_ord : natural := 5;
             n : natural := 3;
             k : natural := 2);
 --  Port ( );
@@ -82,7 +82,7 @@ begin
             start_check <= '1';
         end loop;
         start_check <= '0';
-        report "verification done!" severity failure;
+        report "Verification done!" severity failure;
     end process;
     
     check_process:
@@ -99,7 +99,7 @@ begin
             readline(output_check_vector,check_v);
             tmp := to_std_logic_vector(string(check_v));
             if(abs(signed(tmp) - signed(data_o_s)) > "000000000000000000000111")then
-                report "result mismatch!" severity failure;
+                report "Result mismatch!" severity failure;
             end if;
         end loop;
     end process;

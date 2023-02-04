@@ -16,13 +16,11 @@ end mac;
 architecture Behavioral of mac is
 
     -----------------------------------------------------------------------------------
----------------------
     -- Atributes that need to be defined so Vivado synthesizer maps appropriate
     -- code to DSP cells
     attribute use_dsp : string;
     attribute use_dsp of Behavioral : architecture is "yes";
     -----------------------------------------------------------------------------------
----------------------
     
     signal reg_sum_s : STD_LOGIC_VECTOR (2*input_data_width-1 downto 0):=(others=>'0');
     signal reg_mult_1_s : STD_LOGIC_VECTOR (input_data_width-1 downto 0):=(others=>'0');

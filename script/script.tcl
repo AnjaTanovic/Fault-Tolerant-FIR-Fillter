@@ -32,3 +32,8 @@ add_files -fileset constrs_1 ..\/constraints\/clk_constraint.xdc
 add_files -fileset sim_1 -norecurse ..\/hdl\/tb_communication.vhd
 add_files -fileset sim_1 -norecurse ..\/hdl\/tb_fir.vhd
 update_compile_order -fileset sim_1
+
+# Ukljucivanje skripte za forsiranje signala (SA1 i SA0)
+#set_property SOURCE_SET sources_1 [get_filesets sim_1]
+add_files -fileset sim_1 -norecurse ..\/script\/script_force.tcl
+set_property -name {xsim.simulate.runtime} -value {0 ns} -objects [get_filesets sim_1]

@@ -63,9 +63,7 @@ begin
     voter_concatanate:
     process(voter_reg, voter_input_s)
     begin
-        --voter_input_s(2*input_data_width-1 downto 0) <= voter_reg(0);
         for i in 0 to n - 1 loop
-            --voter_input_s((i+1)*2*input_data_width-1 downto 0) <= voter_reg(i) & voter_input_s(i*2*input_data_width-1 downto 0);
             voter_input_s(2*input_data_width + 2*input_data_width *i-1 downto 2*input_data_width*i) <= voter_reg(i);
         end loop; 
     end process;
@@ -85,11 +83,12 @@ begin
                    else '0';
     end generate;
     
+    stall(0) <= '1';
     stall_logic:
     for i in 0 to n-1 generate
         stall(i+1) <= comp(i) and stall(i);
     end generate;
-    
+
     num_of_failure_registers:
     process(clk_i)
     begin
@@ -101,7 +100,7 @@ begin
             end if;
         end if;
     end process;
-    num_of_failure_next <= std_logic_vector(unsigned(num_of_failure_reg) + 1) when stall(n) = '0' --count failures
+    num_of_failure_next <= std_logic_vector(unsigned(num_of_failure_reg) + 1) when ((comp(n-1) and stall(n-1)) = '0' and (std_logic_vector(unsigned(num_of_failure_reg)) < std_logic_vector(to_unsigned(n/2 + k,log2c(n+k))))) --count failures
                            else num_of_failure_reg;
          
     select_mac:
@@ -109,9 +108,10 @@ begin
     begin
         for i in 0 to n -1 loop
             if (comp(i) = '0') then
-                offset_next(i) <= num_of_failure_next;
-                if (to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)) < n + k) then
-                    voter_next(i) <= inputs_s(to_integer(to_unsigned(i,log2c(n+k)) + unsigned(num_of_failure_next)));
+                --offset = (n - (i + 1)) + num_of_failure
+                offset_next(i) <= std_logic_vector(to_unsigned(n - (i + 1),log2c(n+k)) + unsigned(num_of_failure_next));
+                if (to_integer(to_unsigned(n - (i + 1),log2c(n+k)) + unsigned(num_of_failure_next)) < n + k) then
+                    voter_next(i) <= inputs_s(to_integer(to_unsigned(n - (i + 1),log2c(n+k)) + unsigned(num_of_failure_next)));
                 else
                     voter_next(i)<= inputs_s(i); --system is not correct 
                 end if;
