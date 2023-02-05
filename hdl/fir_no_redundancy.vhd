@@ -4,13 +4,14 @@ use IEEE.NUMERIC_STD.ALL;
 use work.util_pkg.all;
 
 entity fir_param is
-    generic(fir_ord : natural := 10;
+    generic(fir_ord : natural := 5;
             fixed_point : natural := 1;
             input_data_width : natural := 17;
             output_data_width : natural := 17;
             n : natural := 5;
             k : natural := 3);
     Port ( clk_i : in STD_LOGIC;
+           rst_i : in STD_LOGIC;
            we_i : in STD_LOGIC;
            coef_addr_i : in std_logic_vector(log2c(fir_ord+1)-1 downto 0);
            coef_i : in STD_LOGIC_VECTOR (input_data_width-1 downto 0);
@@ -53,6 +54,7 @@ begin
     entity work.mac(behavioral)
     generic map(input_data_width=>input_data_width)
     port map(clk_i=>clk_i,
+             rst_i=>rst_i,
              u_i=>data_i,
              b_i=>b_s(fir_ord),
              sec_i=>delay_reg,
@@ -64,6 +66,7 @@ begin
         entity work.mac(behavioral)
         generic map(input_data_width=>input_data_width)
         port map(clk_i=>clk_i,
+                 rst_i=>rst_i,
                  u_i=>data_i,
                  b_i=>b_s(fir_ord-i),
                  sec_i=>mac_inter(i-1),
